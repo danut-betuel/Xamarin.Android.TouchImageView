@@ -103,3 +103,7 @@ Set which part of the image should remain fixed if the TouchImageView is resized
 Set which part of the image should remain fixed if the screen is rotated.
 
     setOrientationChangeFixedPixel(FixedPixel fixedPixel)
+
+## License
+
+TouchImageView is available under the MIT license. See the LICENSE file for more info.
