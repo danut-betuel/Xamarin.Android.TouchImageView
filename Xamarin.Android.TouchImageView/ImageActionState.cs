@@ -1,6 +1,6 @@
 ﻿namespace Xamarin.Android.TouchImageView
 {
-    public enum TouchImageState
+    public enum ImageActionState
     {
         None = 0,
         Drag = 1,

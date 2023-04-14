@@ -1,15 +1,8 @@
 ﻿using Android.App;
-using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Android.Runtime;
-using Android.Views;
 using Android.Widget;
 using AndroidX.AppCompat.App;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Xamarin.Android.TouchImageView;
 
 namespace Sample.Activities
@@ -40,7 +33,7 @@ namespace Sample.Activities
                 }
                 else
                 {
-                    mImageSingle.SetZoomAnimated(0.9f, 0.5f, 0f, OnZoomFinished);
+                    mImageSingle.SetZoomAnimated(3f, 0.75f, 0.75f, OnZoomFinished);
                 }
             };
 

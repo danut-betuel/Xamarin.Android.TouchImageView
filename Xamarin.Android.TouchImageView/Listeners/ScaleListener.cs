@@ -14,7 +14,7 @@ namespace Xamarin.Android.TouchImageView.Listeners
 
         public override bool OnScaleBegin(ScaleGestureDetector detector)
         {
-            mTouchImageView.State = TouchImageState.Zoom;
+            mTouchImageView.State = ImageActionState.Zoom;
             return true;
         }
 
@@ -29,7 +29,7 @@ namespace Xamarin.Android.TouchImageView.Listeners
         public override void OnScaleEnd(ScaleGestureDetector detector)
         {
             base.OnScaleEnd(detector);
-            mTouchImageView.State = TouchImageState.None;
+            mTouchImageView.State = ImageActionState.None;
             var animateToZoomBoundary = false;
             var targetZoom = mTouchImageView.CurrentZoom;
             if (mTouchImageView.CurrentZoom > mTouchImageView.MaxScale)

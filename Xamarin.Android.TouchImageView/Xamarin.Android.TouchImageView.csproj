@@ -1,26 +1,26 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>monoandroid11.0;monoandroid10.0;monoandroid9;</TargetFrameworks>
+    <TargetFrameworks>net7.0-android</TargetFrameworks>
+    <OutputType>Library</OutputType>
     <AssemblyName>Xamarin.Android.TouchImageView</AssemblyName>
     <RootNamespace>Xamarin.Android.TouchImageView</RootNamespace>
     <PackageId>Xamarin.Android.TouchImageView</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Authors>Betuel</Authors>
     <Product>Xamarin.Android.TouchImageView</Product>
-    <!--<PackageProjectUrl>https://slow.visualstudio.com/_git/DeventureLib</PackageProjectUrl>
-    <RepositoryUrl>https://slow.visualstudio.com/_git/DeventureLib</RepositoryUrl>-->
+    <PackageProjectUrl>https://github.com/danut-betuel/Xamarin.Android.TouchImageView</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/danut-betuel/Xamarin.Android.TouchImageView</RepositoryUrl>
     <Description>Xamarin.Android.TouchImageView copy of https://github.com/MikeOrtiz/TouchImageView</Description>
-    <PackageReleaseNotes>- initial release</PackageReleaseNotes>
+    <PackageReleaseNotes>- migration to .NET 7</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackOnBuild>true</PackOnBuild>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>1.1.0</PackageVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="Resources\*.cs" />
-    <Compile Remove="Resources\*.cs" />
-    <AndroidResource Include="Resources\**\*.xml" Generator="MSBuild:UpdateAndroidResources" />
+    <None Include="..\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -28,13 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AndroidResource Update="Resources\values\attrs_touchimageview.xml">
-      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
-    </AndroidResource>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.2.0.7" />
+    <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1" />
   </ItemGroup>
 
 </Project>

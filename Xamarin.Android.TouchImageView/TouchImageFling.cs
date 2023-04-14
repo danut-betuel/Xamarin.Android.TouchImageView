@@ -14,7 +14,7 @@ namespace Xamarin.Android.TouchImageView
         public TouchImageFling(TouchImageView tiv, int velocityX, int velocityY)
         {
             mTouchImageView = tiv;
-            mTouchImageView.State = TouchImageState.Fling;
+            mTouchImageView.State = ImageActionState.Fling;
             Scroller = new CompatScroller(tiv.Context);
             mTouchImageView.TouchMatrix.GetValues(mTouchImageView.FloatMatrix);
 
@@ -60,7 +60,7 @@ namespace Xamarin.Android.TouchImageView
                 return;
             }
 
-            mTouchImageView.State = TouchImageState.None;
+            mTouchImageView.State = ImageActionState.None;
             Scroller.ForceFinished(true);
         }
 

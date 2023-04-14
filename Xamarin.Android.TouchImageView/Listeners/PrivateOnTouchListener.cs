@@ -18,7 +18,7 @@ namespace Xamarin.Android.TouchImageView.Listeners
         {
             if (mTouchImageView.Drawable == null)
             {
-                mTouchImageView.State = TouchImageState.None;
+                mTouchImageView.State = ImageActionState.None;
                 return false;
             }
             if (mTouchImageView.IsZoomEnabled)
@@ -27,17 +27,17 @@ namespace Xamarin.Android.TouchImageView.Listeners
             }
             mTouchImageView.GestureDetector.OnTouchEvent(e);
             var curr = new PointF(e.GetX(), e.GetY());
-            if (mTouchImageView.State == TouchImageState.None || mTouchImageView.State == TouchImageState.Drag || mTouchImageView.State == TouchImageState.Fling)
+            if (mTouchImageView.State == ImageActionState.None || mTouchImageView.State == ImageActionState.Drag || mTouchImageView.State == ImageActionState.Fling)
             {
                 switch (e.Action)
                 {
                     case MotionEventActions.Down:
                         mLast.Set(curr);
                         if (mTouchImageView.Fling != null) mTouchImageView.Fling.CancelFling();
-                        mTouchImageView.State = TouchImageState.Drag;
+                        mTouchImageView.State = ImageActionState.Drag;
                         break;
                     case MotionEventActions.Move:
-                        if (mTouchImageView.State == TouchImageState.Drag)
+                        if (mTouchImageView.State == ImageActionState.Drag)
                         {
                             var deltaX = curr.X - mLast.X;
                             var deltaY = curr.Y - mLast.Y;
@@ -50,12 +50,14 @@ namespace Xamarin.Android.TouchImageView.Listeners
                         break;
                     case MotionEventActions.Up:
                     case MotionEventActions.PointerUp:
-                        mTouchImageView.State = TouchImageState.None;
+                        mTouchImageView.State = ImageActionState.None;
                         break;
 
                 }
 
             }
+            mTouchImageView.OnTouchCoordinatesAction?.Invoke(v, e, mTouchImageView.TransformCoordTouchToBitmap(e.GetX(), e.GetY(), true));
+
             mTouchImageView.ImageMatrix = mTouchImageView.TouchMatrix;
 
             //

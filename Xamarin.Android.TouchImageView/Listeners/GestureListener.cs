@@ -29,10 +29,7 @@ namespace Xamarin.Android.TouchImageView.Listeners
 
         public override bool OnFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
         {
-            if (mTouchImageView.Fling != null)
-            {
-                mTouchImageView.Fling.CancelFling();
-            }
+            mTouchImageView.Fling?.CancelFling();
             mTouchImageView.Fling = new TouchImageFling(mTouchImageView, (int)velocityX, (int)velocityY);
             mTouchImageView.CompatPostOnAnimation(mTouchImageView.Fling);
 
@@ -42,14 +39,14 @@ namespace Xamarin.Android.TouchImageView.Listeners
         public override bool OnDoubleTap(MotionEvent e)
         {
             var consumed = false;
-            if (e != null && mTouchImageView.IsZoomEnabled)
+            if (mTouchImageView.IsZoomEnabled)
             {
                 if (mTouchImageView.DoubleTapListener != null)
                 {
                     consumed = mTouchImageView.DoubleTapListener.OnDoubleTap(e);
                 }
 
-                if (mTouchImageView.State == TouchImageState.None)
+                if (mTouchImageView.State == ImageActionState.None)
                 {
                     var maxZoomScale = mTouchImageView.DoubleTapScale == 0f ? mTouchImageView.MaxScale : mTouchImageView.DoubleTapScale;
                     var targetZoom = mTouchImageView.CurrentZoom == mTouchImageView.MinScale ? maxZoomScale : mTouchImageView.MinScale;

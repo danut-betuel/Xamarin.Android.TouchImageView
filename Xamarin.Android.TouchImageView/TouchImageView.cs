@@ -18,6 +18,8 @@ namespace Xamarin.Android.TouchImageView
     {
         #region private fields
 
+        private const string INSTANCE_STATE = "instanceState";
+
         private Context mContext;
 
         private Matrix mPrevMatrix;
@@ -36,7 +38,6 @@ namespace Xamarin.Android.TouchImageView
         private ZoomVariables mDelayedZoomVariables;
 
         // Size of view and previous view size (ie before rotation)
-
         private int mPrevViewWidth = 0;
         private int mPrevViewHeight = 0;
 
@@ -50,7 +51,7 @@ namespace Xamarin.Android.TouchImageView
 
         #region public fields
 
-        public TouchImageState State { get; set; }
+        public ImageActionState State { get; set; }
         public float CurrentZoom { get; set; }
         public bool IsZoomEnabled { get; set; }
         public bool IsRotateImageToFitScreen { get; set; }
@@ -65,6 +66,7 @@ namespace Xamarin.Android.TouchImageView
         public float MaxScale { get; set; }
         public float MinScale { get; set; }
         public Action TouchMoveImageViewAction { get; set; }
+        public Action<View, MotionEvent, PointF> OnTouchCoordinatesAction { get; set; }
         public IOnDoubleTapListener DoubleTapListener { get; set; }
         public IOnTouchListener UserTouchListener { get; set; }
         public Matrix TouchMatrix { get; set; }
@@ -233,8 +235,8 @@ namespace Xamarin.Android.TouchImageView
             ResetZoom();
             ScaleImage(scale, ViewWidth / 2f, ViewHeight / 2f, true);
             TouchMatrix.GetValues(FloatMatrix);
-            FloatMatrix[Matrix.MtransX] = (ViewWidth - mMatchViewWidth) / 2 - focusX * (scale - 1) * mMatchViewWidth;
-            FloatMatrix[Matrix.MtransY] = (ViewHeight - mMatchViewHeight) / 2 - focusY * (scale - 1) * mMatchViewHeight;
+            FloatMatrix[Matrix.MtransX] = -(focusX * ImageWidth - ViewWidth * 0.5f);
+            FloatMatrix[Matrix.MtransY] = -(focusY * ImageHeight - ViewHeight * 0.5f);
             TouchMatrix.SetValues(FloatMatrix);
             FixTrans();
             SavePreviousImageValues();
@@ -245,10 +247,10 @@ namespace Xamarin.Android.TouchImageView
          * Set zoom parameters equal to another TouchImageView. Including scale, position,
          * and ScaleType.
          */
-        public void SetZoom(TouchImageView img)
+        public void SetZoom(TouchImageView imageSource)
         {
-            var center = img.ScrollPosition;
-            SetZoom(img.CurrentZoom, center.X, center.Y, img.GetScaleType());
+            var center = imageSource.ScrollPosition;
+            SetZoom(imageSource.CurrentZoom, center.X, center.Y, imageSource.GetScaleType());
         }
 
         public void ScaleImage(double deltaScale, float focusX, float focusY, bool stretchImageToSuper)
@@ -376,14 +378,7 @@ namespace Xamarin.Android.TouchImageView
 
         public void CompatPostOnAnimation(IRunnable runnable)
         {
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.JellyBean)
-            {
-                PostOnAnimation(runnable);
-            }
-            else
-            {
-                PostDelayed(runnable, 1000L / 60L);
-            }
+            PostOnAnimation(runnable);
         }
 
         public float GetFixDragTrans(float delta, float viewSize, float contentSize)
@@ -459,15 +454,19 @@ namespace Xamarin.Android.TouchImageView
          */
         public void SetZoomAnimated(float scale, float focusX, float focusY, int zoomTimeMs, Action onZoomFinishedAction)
         {
-            var animation = new AnimatedZoom(this, scale, new PointF(focusX, focusY), zoomTimeMs);
-            animation.OnZoomFinishedAction = onZoomFinishedAction;
+            var animation = new AnimatedZoom(this, scale, new PointF(focusX, focusY), zoomTimeMs)
+            {
+                OnZoomFinishedAction = onZoomFinishedAction
+            };
             CompatPostOnAnimation(animation);
         }
 
         public void SetZoomAnimated(float scale, float focusX, float focusY, Action onZoomFinishedAction)
         {
-            var animation = new AnimatedZoom(this, scale, new PointF(focusX, focusY), TouchImageConstants.DEFAULT_ZOOM_TIME);
-            animation.OnZoomFinishedAction = onZoomFinishedAction;
+            var animation = new AnimatedZoom(this, scale, new PointF(focusX, focusY), TouchImageConstants.DEFAULT_ZOOM_TIME)
+            {
+                OnZoomFinishedAction = onZoomFinishedAction
+            };
             CompatPostOnAnimation(animation);
         }
 
@@ -538,7 +537,7 @@ namespace Xamarin.Android.TouchImageView
         protected override IParcelable OnSaveInstanceState()
         {
             var bundle = new Bundle();
-            bundle.PutParcelable("instanceState", base.OnSaveInstanceState());
+            bundle.PutParcelable(INSTANCE_STATE, base.OnSaveInstanceState());
             bundle.PutInt("orientation", (int)mOrientation);
             bundle.PutFloat("saveScale", CurrentZoom);
             bundle.PutFloat("matchViewHeight", mMatchViewHeight);
@@ -572,7 +571,7 @@ namespace Xamarin.Android.TouchImageView
                 {
                     mOrientationJustChanged = true;
                 }
-                base.OnRestoreInstanceState(bundle.GetParcelable("instanceState") as IParcelable);
+                base.OnRestoreInstanceState(bundle.GetParcelable(INSTANCE_STATE) as IParcelable);
                 return;
             }
             base.OnRestoreInstanceState(state);
@@ -708,17 +707,14 @@ namespace Xamarin.Android.TouchImageView
             FloatMatrix = new float[9];
             CurrentZoom = 1f;
 
-            if (mTouchScaleType == null)
-            {
-                mTouchScaleType = ScaleType.FitCenter;
-            }
+            mTouchScaleType ??= ScaleType.FitCenter;
             MinScale = 1f;
             MaxScale = 3f;
             mSuperMinScale = TouchImageConstants.SUPER_MIN_MULTIPLIER * MinScale;
             mSuperMaxScale = TouchImageConstants.SUPER_MAX_MULTIPLIER * MaxScale;
             ImageMatrix = TouchMatrix;
             SetScaleType(ScaleType.Matrix);
-            State = TouchImageState.None;
+            State = ImageActionState.None;
 
             mOnDrawReady = false;
             base.SetOnTouchListener(new PrivateOnTouchListener(this));
@@ -967,17 +963,13 @@ namespace Xamarin.Android.TouchImageView
         // Set view dimensions based on layout params
         private int SetViewSize(MeasureSpecMode mode, int size, int drawableWidth)
         {
-            switch (mode)
+            return mode switch
             {
-                case MeasureSpecMode.Exactly:
-                    return size;
-                case MeasureSpecMode.AtMost:
-                    return System.Math.Min(drawableWidth, size);
-                case MeasureSpecMode.Unspecified:
-                    return drawableWidth;
-                default:
-                    return size;
-            }
+                MeasureSpecMode.Exactly => size,
+                MeasureSpecMode.AtMost => System.Math.Min(drawableWidth, size),
+                MeasureSpecMode.Unspecified => drawableWidth,
+                _ => size,
+            };
         }
 
         #endregion

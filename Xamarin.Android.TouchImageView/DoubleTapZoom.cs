@@ -24,7 +24,7 @@ namespace Xamarin.Android.TouchImageView
 
         public DoubleTapZoom(TouchImageView touchImageView, float targetZoom, float focusX, float focusY, bool stretchImageToSuper)
         {
-            touchImageView.State = TouchImageState.AnimateZoom;
+            touchImageView.State = ImageActionState.AnimateZoom;
             mTouchImageView = touchImageView;
 
             mStartTime = JavaSystem.CurrentTimeMillis();
@@ -44,7 +44,7 @@ namespace Xamarin.Android.TouchImageView
         {
             if (mTouchImageView.Drawable == null)
             {
-                mTouchImageView.State = TouchImageState.None;
+                mTouchImageView.State = ImageActionState.None;
                 return;
             }
             var t = Interpolate();
@@ -65,7 +65,7 @@ namespace Xamarin.Android.TouchImageView
             else
             {
                 // Finished zooming
-                mTouchImageView.State = TouchImageState.None;
+                mTouchImageView.State = ImageActionState.None;
             }
         }
 

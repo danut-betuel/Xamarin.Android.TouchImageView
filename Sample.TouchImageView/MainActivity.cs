@@ -1,6 +1,5 @@
 ﻿using Android.App;
 using Android.OS;
-using Android.Runtime;
 using Android.Widget;
 using AndroidX.AppCompat.App;
 using Sample.Activities;
@@ -29,7 +28,6 @@ namespace Sample
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
 
@@ -61,13 +59,6 @@ namespace Sample
             mAnimateButton = FindViewById<Button>(Resource.Id.animate_button);
             mGlideButton = FindViewById<Button>(Resource.Id.glide_button);
             mShapedImageButton = FindViewById<Button>(Resource.Id.shaped_image_button);
-        }
-
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
-        {
-            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-
-            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 }

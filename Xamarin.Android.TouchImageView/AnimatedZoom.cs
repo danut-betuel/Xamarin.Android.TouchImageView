@@ -27,7 +27,7 @@ namespace Xamarin.Android.TouchImageView
         public AnimatedZoom(TouchImageView touchImageView, float targetZoom, PointF focus, int zoomTimeMillis)
         {
             mTouchImageView = touchImageView;
-            touchImageView.State = TouchImageState.AnimateZoom;
+            touchImageView.State = ImageActionState.AnimateZoom;
             mStartTime = JavaSystem.CurrentTimeMillis();
             mStartZoom = touchImageView.CurrentZoom;
             mTargetZoom = targetZoom;
@@ -55,7 +55,7 @@ namespace Xamarin.Android.TouchImageView
             else
             {
                 // Finished zooming
-                mTouchImageView.State = TouchImageState.None;
+                mTouchImageView.State = ImageActionState.None;
                 OnZoomFinishedAction?.Invoke();
             }
         }
